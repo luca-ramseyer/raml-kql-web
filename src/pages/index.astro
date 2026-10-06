@@ -1,0 +1,179 @@
+---
+import { Code } from 'astro:components';
+import { readFileSync } from 'node:fs';
+import Base from '../layouts/Base.astro';
+import Wordmark from '../components/Wordmark.astro';
+import ramlTheme from '../shiki/raml-theme.json';
+import { downloads, getRelease, releasesUrl, repoUrl } from '../lib/release';
+
+const base = import.meta.env.BASE_URL;
+const release = getRelease();
+const platforms = downloads(release);
+const date = release ? new Intl.DateTimeFormat('en-GB', { dateStyle: 'long', timeZone: 'UTC' }).format(new Date(release.publishedAt)) : '';
+const sums = release?.assets.find((a) => a.name === 'SHA256SUMS');
+
+type Shot = { width: number; height: number; widths: number[] };
+let shots: Record<string, Shot> = {};
+try { shots = JSON.parse(readFileSync('./public/shots/manifest.json', 'utf8')); } catch { /* run npm run fetch */ }
+const srcset = (name: string) => shots[name].widths.map((w) => `${base}shots/${name}-${w}.webp ${w}w`).join(', ');
+
+// TODO(luca): these two links assume the docs keep these paths after your docs clean-up.
+const docs = { packs: `${base}docs/guides/query-packs/`, extensions: `${base}docs/guides/writing-extensions/`, entra: `${base}docs/guides/entra-app-registration/` };
+
+const query = `SigninLogs
+| where TimeGenerated > ago(1d)
+| where ResultType != 0
+| summarize failures = count() by _TenantName, UserPrincipalName
+| top 20 by failures`;
+
+const features = [
+  { title: 'One query, every tenant', body: 'Pick workspaces and tenant groups, press Shift+Enter, and results arrive as each workspace finishes. Slow or throttled workspaces are retried and reported one by one, so they never hide the ones that worked. Every row carries _TenantName and _WorkspaceName.' },
+  { title: 'An editor you already know', body: 'The layout, themes and keybindings follow VS Code. Under it sits the Monaco editor with the Kusto language service: IntelliSense merged across the selected workspaces, formatting, snippets, and parse checks before anything is sent.' },
+  { title: 'Extensions with least privilege', body: 'Sandboxed extensions add enrichers, result renderers, themes and commands. Each permission is requested explicitly and can be revoked. The repository includes a VirusTotal enricher and a country map renderer as examples.', href: docs.extensions, link: 'Write an extension' },
+  { title: 'Shareable query packs', body: 'A pack is a folder of parameterised .kql files and a small manifest, shared through a git repository or a file. Packs are data only. They never run code, and no query runs until you press Run.', href: docs.packs, link: 'Write a pack' },
+];
+---
+<Base title="Raml KQL">
+  <section class="hero wrap">
+    <div class="mark"><Wordmark as="p" size="clamp(32px, 9vw, 56px)" tagline /></div>
+    <h1>One KQL query across every tenant you work in.</h1>
+    <p class="lede">Raml KQL is an open-source desktop app for macOS, Windows and Linux. It queries Log Analytics and Microsoft Sentinel workspaces across many Entra tenants through Azure Lighthouse and guest access, and returns one merged result. You do not need a Defender multi-tenant organization.</p>
+    <div class="cta">
+      <a class="btn btn-primary" href="#download">Download</a>
+      <a class="btn" href={`${base}docs/`}>Read the docs</a>
+    </div>
+    <p class="small"><a href={repoUrl}>View on GitHub</a>{release && <><span class="dot" aria-hidden="true">·</span>Version {release.version}</>}</p>
+  </section>
+
+  <section class="wrap shot" aria-label="Screenshot">
+    {shots.app ? (
+      <img
+        src={`${base}shots/app-1600.webp`} srcset={srcset('app')} sizes="(min-width: 1200px) 1152px, 100vw"
+        width={shots.app.width} height={shots.app.height} fetchpriority="high"
+        alt="Raml KQL in the dark theme, showing one query run across ten workspaces in five tenants, with a merged results grid."
+      />
+    ) : <div class="placeholder">Screenshot: public/screenshots/app.png</div>}
+  </section>
+
+  <section class="wrap block" id="features">
+    <p class="eyebrow">What it does</p>
+    <h2>Built for the work between customers</h2>
+    <div class="features">
+      {features.map((f) => (
+        <div class="feature">
+          <h3>{f.title}</h3>
+          <p>{f.body}</p>
+          {f.href && <p><a href={f.href}>{f.link}</a></p>}
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="wrap block" id="audience">
+    <div class="split">
+      <div>
+        <p class="eyebrow">Who it is for</p>
+        <h2>Analysts working across customer tenants without an MTO</h2>
+      </div>
+      <div>
+        <p>If you work in a SOC or at an MSSP and reach customer workspaces through Azure Lighthouse or guest access, you often need to ask the same question of all of them. Defender’s multi-tenant advanced hunting does that when your organization has set up a multi-tenant organization (MTO). Raml KQL covers the case where it has not.</p>
+        <dl class="compare">
+          <div><dt class="label">Defender XDR</dt><dd>Requires an MTO. Queries advanced hunting tables, in the Defender portal.</dd></div>
+          <div><dt class="label">Raml KQL</dt><dd>Requires your own access to each workspace. Queries Log Analytics workspaces, including Sentinel, from a desktop app.</dd></div>
+        </dl>
+        <p>It is a tool for your toolbelt, not a replacement for either product. It only does what you are allowed to do, using your delegated permissions.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap block" id="download">
+    <p class="eyebrow">Download</p>
+    <h2>{release ? `Version ${release.version}` : 'Latest release'}</h2>
+    {release && <p class="small">Released {date}</p>}
+    <ul class="downloads">
+      {platforms.map((p) => (
+        <li>
+          <a href={p.asset?.url ?? releasesUrl} rel="noopener">
+            <span class="label">{p.label}</span>
+            <span>{p.detail}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+    <p class="small">
+      Every release lists a <a href={sums?.url ?? releasesUrl}>SHA256SUMS</a> file. The macOS app is signed and notarized. The Windows installer is not code-signed yet, so SmartScreen shows a warning on first run: choose “More info”, then “Run anyway”. {/* TODO(luca): update when Windows signing is in place. */}
+      The app updates itself from <a href={releasesUrl}>GitHub Releases</a>.
+    </p>
+  </section>
+
+  <section class="wrap block" id="quick-start">
+    <p class="eyebrow">Quick start</p>
+    <h2>From install to first result</h2>
+    <ol class="steps">
+      <li><h3>Install and add an account</h3><p>Open the Accounts menu in the activity bar and choose Add Account. Your browser opens for the Microsoft sign-in. Add more accounts the same way. You need the Log Analytics Reader role on each workspace you query. <a href={docs.entra}>Consent and app registration</a></p></li>
+      <li><h3>Check your targets</h3><p>Workspaces from Lighthouse delegations and guest access appear in Targets, grouped by tenant. Disable the ones you never query, and make groups for the sets you use together.</p></li>
+      <li><h3>Write and run</h3><p>Press Ctrl/Cmd+N for a new query, choose a time range, and press Shift+Enter.</p></li>
+    </ol>
+    <div class="code"><Code code={query} lang="kql" theme={ramlTheme as never} /></div>
+    <p class="small">No Azure access at hand? Run “Restart in Demo Mode” from the Command Palette (F1) to try the app with fake tenants and data.</p>
+  </section>
+
+  {shots.chart && (
+    <section class="wrap shot" aria-label="Chart screenshot">
+      <img src={`${base}shots/chart-1600.webp`} srcset={srcset('chart')} sizes="(min-width: 1200px) 1152px, 100vw" width={shots.chart.width} height={shots.chart.height} loading="lazy" decoding="async"
+        alt="A line chart from the render operator, with one line per tenant." />
+    </section>
+  )}
+
+  <section class="wrap block" id="open-source">
+    <div class="split">
+      <div>
+        <p class="eyebrow">Open source</p>
+        <h2>MIT licensed, no telemetry</h2>
+      </div>
+      <div>
+        <p>Raml KQL is released under the <a href={`${repoUrl}/blob/main/LICENSE`}>MIT licence</a>. It collects no usage data. Your queries go from your machine to Microsoft with your own identity, and no Raml KQL server is involved. You can check this yourself: Developer: Show Network Activity lists every host the app contacts.</p>
+        <p>Bug reports, ideas and pull requests are welcome. Read the <a href={`${repoUrl}/blob/main/CONTRIBUTING.md`}>contributing guide</a>, then <a href={`${repoUrl}/issues`}>open an issue</a> or start with the code on <a href={repoUrl}>GitHub</a>. To report a vulnerability, use the private reporting option under the repository’s <a href={`${repoUrl}/security`}>Security</a> tab.</p>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero { text-align: center; padding-block: var(--s8) var(--s6); }
+  .mark { margin-bottom: var(--s6); }
+  .mark :global(.wordmark) { margin-right: -0.24em; display: inline-block; }
+  .mark :global(.tagline) { margin-top: var(--s2); }
+  .hero h1 { font-size: var(--text-display); max-width: 18ch; margin: 0 auto var(--s3); letter-spacing: -0.005em; }
+  .lede { max-width: 640px; margin: 0 auto var(--s4); font-size: 18px; }
+  .cta { display: flex; gap: var(--s2); justify-content: center; flex-wrap: wrap; margin-bottom: var(--s3); }
+  .small { font-size: var(--text-small); margin: 0; }
+  .shot img, .placeholder { width: 100%; height: auto; border: 1px solid var(--hairline); border-radius: var(--radius); background: var(--ivory); }
+  .placeholder { padding: var(--s8) var(--s3); text-align: center; }
+  .block { padding-top: var(--s8); }
+  .block > h2 { margin-bottom: var(--s5); max-width: 22ch; }
+  .features { display: grid; gap: var(--s5) var(--s6); grid-template-columns: 1fr; }
+  .feature { border-top: 1px solid var(--hairline); padding-top: var(--s3); }
+  .feature h3 { margin-bottom: var(--s1); }
+  .split { display: grid; gap: var(--s4) var(--s6); grid-template-columns: 1fr; }
+  .split h2 { max-width: 16ch; }
+  .compare { margin: var(--s3) 0; border-top: 1px solid var(--hairline); }
+  .compare > div { display: grid; grid-template-columns: 1fr; gap: 4px; padding: var(--s2) 0; border-bottom: 1px solid var(--hairline); }
+  .compare dt, .compare dd { margin: 0; }
+  .downloads { list-style: none; padding: 0; margin: var(--s4) 0 var(--s3); display: grid; gap: var(--s2); grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+  .downloads a { display: flex; flex-direction: column; gap: 4px; padding: var(--s3); background: var(--ivory); border: 1px solid var(--hairline); border-radius: var(--radius); text-decoration: none; height: 100%; }
+  .downloads a:hover { border-color: var(--red-deep); }
+  .downloads .label { color: var(--ink); }
+  .steps { list-style: none; counter-reset: s; padding: 0; margin: 0 0 var(--s4); display: grid; gap: var(--s4); grid-template-columns: 1fr; }
+  .steps li { counter-increment: s; border-top: 1px solid var(--hairline); padding-top: var(--s3); }
+  .steps li::before { content: '0' counter(s); font: 500 var(--text-eyebrow) / 1 var(--font-sans); letter-spacing: var(--tracking-label); color: var(--ink); display: block; margin-bottom: var(--s2); }
+  .steps h3 { margin-bottom: var(--s1); }
+  .code { max-width: var(--measure); margin-bottom: var(--s2); }
+  .code :global(pre) { margin: 0; padding: var(--s3); overflow-x: auto; border-radius: var(--radius); font: 400 14px / 1.7 var(--font-mono); }
+  @media (min-width: 800px) {
+    .features { grid-template-columns: 1fr 1fr; }
+    .split { grid-template-columns: 5fr 7fr; }
+    .compare > div { grid-template-columns: 160px 1fr; gap: var(--s3); }
+    .steps { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
