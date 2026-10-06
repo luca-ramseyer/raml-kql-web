@@ -1,0 +1,33 @@
+{
+  "name": "raml-kql-web",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "fetch": "node scripts/fetch-docs.mjs && node scripts/fetch-release.mjs && node scripts/prepare-screenshots.mjs",
+    "predev": "npm run fetch",
+    "dev": "astro dev",
+    "prebuild": "npm run fetch",
+    "build": "astro check && astro build && pagefind --site dist",
+    "preview": "astro preview",
+    "check": "astro check",
+    "og": "node scripts/make-og.mjs"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@astrojs/markdown-remark": "^7.3.2",
+    "@astrojs/sitemap": "^3.7.4",
+    "astro": "^7.3.6",
+    "github-slugger": "^2.0.0",
+    "pagefind": "^1.5.2",
+    "sharp": "^0.35.5",
+    "unist-util-visit": "^5.1.0"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.63.0",
+    "typescript": "^6.0.3"
+  }
+}

@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.astro/
+.content/
+public/docs-assets/
+public/pagefind/
+public/shots/
+.env
+.DS_Store
