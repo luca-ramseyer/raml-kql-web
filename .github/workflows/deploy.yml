@@ -1,0 +1,50 @@
+# Builds the site (docs are fetched from the app repo at build time) and deploys to GitHub Pages.
+# To move to Vercel: delete this file, import the repo in Vercel, set the same env vars. See README.
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  # Sent by the app repo (docs/app-repo-workflow/notify-website.yml) when docs change or a release ships.
+  repository_dispatch:
+    types: [docs-updated]
+  workflow_dispatch:
+  # Safety net: keeps the release version and docs current even if a dispatch is missed.
+  schedule:
+    - cron: '17 5 * * *'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      # Optional repository variables (Settings > Secrets and variables > Actions > Variables).
+      DOCS_REPO: ${{ vars.DOCS_REPO }}
+      DOCS_REF: ${{ vars.DOCS_REF }}
+      DOCS_PATH: ${{ vars.DOCS_PATH }}
+      SITE_URL: ${{ vars.SITE_URL }}
+      SITE_BASE: ${{ vars.SITE_BASE }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # release lookup only; raises the API rate limit
+    steps:
+      - uses: actions/checkout@v5
+      - uses: withastro/action@v6
+        with:
+          node-version: 22
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
