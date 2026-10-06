@@ -25,7 +25,9 @@ const fonts = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,
     <link rel="canonical" href={canonical} />
     <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
     <link rel="apple-touch-icon" href={`${base}apple-touch-icon.png`} />
-    <meta name="theme-color" content="#F4EFE4" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#F4EFE4" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#1B1916" media="(prefers-color-scheme: dark)" />
     <meta property="og:site_name" content={SITE} />
     <meta property="og:type" content={type} />
     <meta property="og:title" content={full} />

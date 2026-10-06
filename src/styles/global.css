@@ -131,8 +131,8 @@ dialog.search .bar button { font: 500 var(--text-eyebrow) / 1 var(--font-sans); 
 .code { position: relative; }
 .code pre, .prose pre {
   margin: 0 0 var(--s3); padding: var(--s3); overflow-x: auto;
-  background: var(--ink); color: var(--cream);
-  border-radius: var(--radius);
+  background: var(--code-bg); color: var(--code-fg);
+  border: 1px solid var(--code-line); border-radius: var(--radius);
   font: 400 14px / 1.7 var(--font-mono);
   tab-size: 2;
 }
@@ -142,13 +142,13 @@ pre code { font: inherit; background: none; border: 0; padding: 0; color: inheri
 .copy {
   position: absolute; top: var(--s1); right: var(--s1);
   font: 500 11px / 1 var(--font-sans); text-transform: uppercase; letter-spacing: var(--tracking-label);
-  color: var(--hairline); background: var(--ink);
-  border: 1px solid var(--graphite); border-radius: var(--radius);
+  color: var(--code-muted); background: var(--code-bg);
+  border: 1px solid var(--code-line); border-radius: var(--radius);
   padding: 6px 10px; cursor: pointer;
   transition: color var(--motion), border-color var(--motion);
 }
-.copy:hover { color: var(--cream); border-color: var(--hairline); }
-.copy:focus-visible { outline-color: var(--cream); }
+.copy:hover { color: var(--code-fg); border-color: var(--code-muted); }
+.copy:focus-visible { outline-color: var(--code-fg); }
 :not(pre) > code {
   font: 400 0.88em / 1 var(--font-mono);
   background: var(--ivory); border: 1px solid var(--hairline); border-radius: var(--radius);

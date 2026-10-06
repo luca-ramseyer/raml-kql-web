@@ -169,7 +169,7 @@ const features = [
   .steps li::before { content: '0' counter(s); font: 500 var(--text-eyebrow) / 1 var(--font-sans); letter-spacing: var(--tracking-label); color: var(--ink); display: block; margin-bottom: var(--s2); }
   .steps h3 { margin-bottom: var(--s1); }
   .code { max-width: var(--measure); margin-bottom: var(--s2); }
-  .code :global(pre) { margin: 0; padding: var(--s3); overflow-x: auto; border-radius: var(--radius); font: 400 14px / 1.7 var(--font-mono); }
+  .code :global(pre) { margin: 0; padding: var(--s3); overflow-x: auto; border: 1px solid var(--code-line); border-radius: var(--radius); font: 400 14px / 1.7 var(--font-mono); }
   @media (min-width: 800px) {
     .features { grid-template-columns: 1fr 1fr; }
     .split { grid-template-columns: 5fr 7fr; }

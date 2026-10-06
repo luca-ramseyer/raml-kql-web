@@ -111,6 +111,7 @@ The source of truth is the [brand style guide](https://luca-ramseyer.github.io/b
 - **Exception, flagged:** code blocks and inline code use the system monospace stack (`ui-monospace, "SF Mono", Menlo, Consolas, monospace`). No web font is loaded for it.
 - Fonts load from Google Fonts with `display=swap`. Metric-matched fallback faces ("Montserrat Fallback", "Cormorant Fallback") are added after the web fonts in the stacks to limit layout shift. They are fallbacks, not a third family.
 - Contrast: stone (`#857E72`) is 3.5:1 on cream, so it is never used for text. Red (`#C0473A`) is 4.4:1 on cream, so text that turns red on hover uses the brand's `--red-deep` (`#A63B30`, 5.6:1), and the primary button is ink with cream text.
+- Dark mode follows the system setting (`prefers-color-scheme`), with no manual toggle. Roles are swapped, not new hues: ink becomes the surface and cream the text. Only two values are not brand tokens, the page ground `#1B1916` and the lighter hover red `#E57F72`, both documented in `src/styles/tokens.css`. Code blocks keep the same ink theme in both modes.
 - The favicon is `public/favicon.svg`: arm thickness 21.5%, arm length 62%, corner radius 10% of the square.
 - No analytics, no cookies, no third-party requests other than Google Fonts.
 
