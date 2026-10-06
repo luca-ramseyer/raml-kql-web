@@ -1,0 +1,42 @@
+---
+import Base from './Base.astro';
+import DocsNav from '../components/DocsNav.astro';
+import '../styles/docs.css';
+import type { NavSection } from '../lib/docs';
+
+interface Heading { depth: number; slug: string; text: string }
+interface Props { title: string; description?: string; nav: NavSection; current: string; headings?: Heading[]; edit?: string }
+const { title, description, nav, current, headings = [], edit } = Astro.props;
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+<Base title={title} description={description} type="article">
+  <div class="wrap docs">
+    <details class="docs-menu">
+      <summary>Documentation menu</summary>
+      <nav class="docs-nav" aria-label="Documentation"><DocsNav section={nav} current={current} /></nav>
+    </details>
+    <aside class="docs-side">
+      <nav class="docs-nav" aria-label="Documentation"><DocsNav section={nav} current={current} /></nav>
+    </aside>
+    <article data-pagefind-body>
+      <header class="doc-head">
+        <p class="eyebrow">Documentation</p>
+        <h1>{title}</h1>
+        {description && <p>{description}</p>}
+      </header>
+      <div class="prose"><slot /></div>
+      <footer class="doc-foot">
+        <slot name="pager" />
+        {edit && <p><a href={edit}>Edit this page on GitHub</a></p>}
+      </footer>
+    </article>
+    {toc.length > 0 && (
+      <nav class="docs-toc" aria-label="On this page" data-pagefind-ignore>
+        <p class="label">On this page</p>
+        <ul>
+          {toc.map((h) => <li class={`l${h.depth}`}><a href={`#${h.slug}`}>{h.text}</a></li>)}
+        </ul>
+      </nav>
+    )}
+  </div>
+</Base>

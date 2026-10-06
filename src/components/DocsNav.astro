@@ -1,0 +1,17 @@
+---
+import type { NavSection } from '../lib/docs';
+interface Props { section: NavSection; current: string }
+const { section, current } = Astro.props;
+const Self = Astro.self;
+---
+<ul>
+  {section.items.map((i) => (
+    <li><a href={i.href} aria-current={i.href === current ? 'page' : undefined}>{i.title}</a></li>
+  ))}
+  {section.sections.map((s) => (
+    <li>
+      <p class="group">{s.href ? <a href={s.href} aria-current={s.href === current ? 'page' : undefined}>{s.title}</a> : s.title}</p>
+      <Self section={s} current={current} />
+    </li>
+  ))}
+</ul>

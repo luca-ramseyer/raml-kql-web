@@ -1,0 +1,45 @@
+---
+import { render } from 'astro:content';
+import DocsNav from '../../components/DocsNav.astro';
+import Docs from '../../layouts/Docs.astro';
+import { buildNav, docHref, docTitle, editUrl, flatten, getDocs, docsMeta, type Doc } from '../../lib/docs';
+
+export async function getStaticPaths() {
+  const docs = await getDocs();
+  const nav = buildNav(docs);
+  const order = flatten(nav);
+  const paths: { params: { slug: string | undefined }; props: { doc?: Doc; nav: typeof nav; order: typeof order } }[] = docs
+    .filter((d) => d.id !== 'index')
+    .map((doc) => ({ params: { slug: doc.id }, props: { doc, nav, order } }));
+  const index = docs.find((d) => d.id === 'index');
+  paths.push({ params: { slug: undefined }, props: { doc: index, nav, order } });
+  return paths;
+}
+
+const { doc, nav, order } = Astro.props;
+const current = doc ? docHref(doc.id) : docHref('index');
+const rendered = doc ? await render(doc) : null;
+const i = order.findIndex((o) => o.href === current);
+const prev = i > 0 ? order[i - 1] : undefined;
+const next = i >= 0 && i < order.length - 1 ? order[i + 1] : undefined;
+const { Content, headings } = rendered ?? {};
+---
+<Docs
+  title={doc ? docTitle(doc) : 'Documentation'}
+  description={doc?.data.description ?? (doc ? undefined : 'Guides for installing, using and extending Raml KQL.')}
+  nav={nav}
+  current={current}
+  headings={headings}
+  edit={doc ? editUrl(doc) : undefined}
+>
+  {Content ? <Content /> : (
+    <>
+      <p>Guides for installing, using and extending Raml KQL. The pages are written in the <a href={`https://github.com/${docsMeta.repo}/tree/${docsMeta.ref}/${docsMeta.path}`}>app repository</a> and rendered here.</p>
+      <div class="docs-nav index"><DocsNav section={nav} current={current} /></div>
+    </>
+  )}
+  <nav slot="pager" class="pager" aria-label="Pages">
+    {prev && <a href={prev.href} rel="prev"><small class="label">Previous</small>{prev.title}</a>}
+    {next && <a class="next" href={next.href} rel="next"><small class="label">Next</small>{next.title}</a>}
+  </nav>
+</Docs>
