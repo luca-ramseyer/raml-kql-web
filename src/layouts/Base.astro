@@ -1,0 +1,72 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Search from '../components/Search.astro';
+
+interface Props { title: string; description?: string; image?: string; type?: 'website' | 'article' }
+const SITE = 'Raml KQL';
+const { title, description = 'Run one KQL query across many Entra tenants and Log Analytics workspaces, without a Defender multi-tenant organization. Open source.', image = '/og.png', type = 'website' } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const full = title === SITE ? title : `${title} · ${SITE}`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const og = new URL(base.replace(/\/$/, '') + image, Astro.site);
+// Non-blocking font stylesheet: loads as print, switches to all when ready.
+const deferred = { media: 'print', onload: "this.media='all'" };
+const fonts = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Montserrat:wght@300;400;500;600&display=swap';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{full}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
+    <link rel="apple-touch-icon" href={`${base}apple-touch-icon.png`} />
+    <meta name="theme-color" content="#F4EFE4" />
+    <meta property="og:site_name" content={SITE} />
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={full} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={og} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href={fonts} {...deferred} />
+    <noscript><link rel="stylesheet" href={fonts} /></noscript>
+    <link rel="sitemap" href={`${base}sitemap-index.xml`} />
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <Header />
+    <main id="main"><slot /></main>
+    <Footer />
+    <Search />
+    <script>
+      // Copy buttons for every code block (progressive enhancement).
+      document.querySelectorAll<HTMLPreElement>('main pre').forEach((pre) => {
+        const wrap = document.createElement('div');
+        wrap.className = 'code';
+        pre.replaceWith(wrap);
+        wrap.append(pre);
+        const btn = document.createElement('button');
+        btn.type = 'button'; btn.className = 'copy'; btn.textContent = 'Copy';
+        btn.setAttribute('aria-label', 'Copy code to clipboard');
+        btn.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(pre.innerText.replace(/\n$/, ''));
+            btn.textContent = 'Copied';
+          } catch { btn.textContent = 'Press ⌘C'; }
+          setTimeout(() => (btn.textContent = 'Copy'), 1800);
+        });
+        wrap.append(btn);
+      });
+    </script>
+  </body>
+</html>

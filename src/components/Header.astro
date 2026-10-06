@@ -1,0 +1,20 @@
+---
+import Wordmark from './Wordmark.astro';
+const base = import.meta.env.BASE_URL;
+const path = Astro.url.pathname;
+const inDocs = path.startsWith(`${base}docs`);
+---
+<header class="site-header">
+  <div class="wrap">
+    <Wordmark href={base} size="20px" />
+    <nav class="site-nav" aria-label="Main">
+      <a href={`${base}docs/`} aria-current={inDocs ? 'page' : undefined}>Docs</a>
+      <span class="dot" aria-hidden="true">·</span>
+      <a href={`${base}#download`}>Download</a>
+      <span class="dot" aria-hidden="true">·</span>
+      <a href="https://github.com/luca-ramseyer/raml-kql">GitHub</a>
+      <span class="dot" aria-hidden="true">·</span>
+      <button type="button" data-search-open aria-haspopup="dialog">Search</button>
+    </nav>
+  </div>
+</header>

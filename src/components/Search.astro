@@ -1,0 +1,32 @@
+---
+const base = import.meta.env.BASE_URL;
+---
+<dialog class="search" id="search" aria-label="Search the docs">
+  <div class="bar"><span class="label">Search the docs</span><button type="button" data-search-close>Close</button></div>
+  <div id="search-ui" class="pagefind-ui"></div>
+</dialog>
+<script define:vars={{ base }}>
+  const dialog = document.getElementById('search');
+  let loaded = false;
+  const load = () => new Promise((resolve, reject) => {
+    const css = document.createElement('link');
+    css.rel = 'stylesheet'; css.href = `${base}pagefind/pagefind-ui.css`;
+    document.head.append(css);
+    const js = document.createElement('script');
+    js.src = `${base}pagefind/pagefind-ui.js`; js.onload = resolve; js.onerror = reject;
+    document.head.append(js);
+  });
+  document.querySelectorAll('[data-search-open]').forEach((b) => b.addEventListener('click', async () => {
+    dialog.showModal();
+    if (loaded) return;
+    loaded = true;
+    try {
+      await load();
+      new PagefindUI({ element: '#search-ui', showSubResults: true, showImages: false, resetStyles: false, autofocus: true });
+    } catch {
+      document.getElementById('search-ui').textContent = 'Search is built with the site and is not available in the dev server. Run a production build to try it.';
+    }
+  }));
+  dialog.querySelector('[data-search-close]').addEventListener('click', () => dialog.close());
+  dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
+</script>

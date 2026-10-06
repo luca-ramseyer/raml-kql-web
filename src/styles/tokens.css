@@ -1,0 +1,60 @@
+/*
+ * Design tokens. Values come from the brand repo's tokens.json (luca-ramseyer/brand, v1.0.0).
+ * The names on the left follow this project's brief; the comment gives the brand-token name.
+ * Do not add colours or fonts here. Update the brand repo first.
+ */
+/* Metric-matched fallbacks: keep layout stable while the Google fonts swap in (no layout shift). */
+@font-face {
+  font-family: "Montserrat Fallback";
+  src: local("Arial"), local("Liberation Sans"), local("Helvetica");
+  size-adjust: 110.6%; ascent-override: 87.5%; descent-override: 22.7%; line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Cormorant Fallback";
+  src: local("Times New Roman"), local("Liberation Serif"), local("Times");
+  size-adjust: 95%; ascent-override: 97.3%; descent-override: 30.2%; line-gap-override: 0%;
+}
+
+:root {
+  --cream: #F4EFE4;     /* brand: paper    primary surface */
+  --ivory: #FBF8F1;     /* brand: surface  elevated panels, cards */
+  --ink: #211F1C;       /* brand: ink      headings, wordmark */
+  --graphite: #423D37;  /* brand: body     body text */
+  --stone: #857E72;     /* brand: muted    non-essential only (3.5:1 on cream, never for text) */
+  --red: #C0473A;       /* brand: red      accent: separator dot, one primary action */
+  --red-deep: #A63B30;  /* brand: red-deep accent hover/pressed; also the AA-safe red for text */
+  --hairline: #DAD2C4;  /* brand: line     rules, borders */
+
+  --font-display: "Cormorant Garamond", "Cormorant", "Cormorant Fallback", Georgia, "Times New Roman", serif;
+  --font-sans: "Montserrat", "Montserrat Fallback", "Helvetica Neue", Arial, sans-serif;
+  /* The one exception to "two typefaces": code needs monospace. System stack, no web font. */
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --text-display: clamp(40px, 8vw, 56px);
+  --text-h1: 40px;
+  --text-h2: 30px;
+  --text-h3: 21px;
+  --text-body: 16px;
+  --text-small: 13px;
+  --text-eyebrow: 12px;
+
+  --tracking-wordmark: 0.24em;
+  --tracking-label: 0.14em;
+  --leading-body: 1.75;
+  --leading-tight: 1.15;
+
+  --s1: 8px;
+  --s2: 16px;
+  --s3: 24px;
+  --s4: 32px;
+  --s5: 48px;
+  --s6: 64px;
+  --s7: 96px;
+  --s8: 128px;
+
+  --radius: 3px;
+  --motion: 200ms;
+  --measure: 920px;
+  --page: 1200px;
+  --gutter: 24px;
+}
