@@ -25,6 +25,14 @@
   --red-deep: #A63B30;  /* brand: red-deep accent hover/pressed; also the AA-safe red for text */
   --hairline: #DAD2C4;  /* brand: line     rules, borders */
 
+  /* Code blocks keep one dark theme in both colour schemes, so they are not inverted below. */
+  --code-bg: #211F1C;
+  --code-fg: #F4EFE4;
+  --code-muted: #DAD2C4;
+  --code-line: #423D37;
+
+  color-scheme: light dark;
+
   --font-display: "Cormorant Garamond", "Cormorant", "Cormorant Fallback", Georgia, "Times New Roman", serif;
   --font-sans: "Montserrat", "Montserrat Fallback", "Helvetica Neue", Arial, sans-serif;
   /* The one exception to "two typefaces": code needs monospace. System stack, no web font. */
@@ -57,4 +65,22 @@
   --measure: 920px;
   --page: 1200px;
   --gutter: 24px;
+}
+
+/*
+ * Dark mode, following the system setting. Roles are swapped, not new hues:
+ * ink becomes the surface, cream the text. The only values that are not brand tokens are the
+ * page ground (#1B1916, a step darker than ink so cards and code can sit on it) and the
+ * lighter red (#E57F72, same tint as the code theme), needed because #C0473A is only
+ * 3.3:1 on ink and so cannot be used for text.
+ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --cream: #1B1916;
+    --ivory: #211F1C;
+    --ink: #F4EFE4;
+    --graphite: #DAD2C4;
+    --hairline: #423D37;
+    --red-deep: #E57F72;  /* hover/pressed red, lightened for AA on dark */
+  }
 }
