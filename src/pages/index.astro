@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import Base from '../layouts/Base.astro';
 import Wordmark from '../components/Wordmark.astro';
 import ramlTheme from '../shiki/raml-theme.json';
+import { docHref, getDocs } from '../lib/docs';
 import { downloads, getRelease, releasesUrl, repoUrl } from '../lib/release';
 
 const base = import.meta.env.BASE_URL;
@@ -17,8 +18,19 @@ let shots: Record<string, Shot> = {};
 try { shots = JSON.parse(readFileSync('./public/shots/manifest.json', 'utf8')); } catch { /* run npm run fetch */ }
 const srcset = (name: string) => shots[name].widths.map((w) => `${base}shots/${name}-${w}.webp ${w}w`).join(', ');
 
-// TODO(luca): these two links assume the docs keep these paths after your docs clean-up.
-const docs = { packs: `${base}docs/guides/query-packs/`, extensions: `${base}docs/guides/writing-extensions/`, entra: `${base}docs/guides/entra-app-registration/` };
+// Doc pages the landing page links to. If the app repo renames one, the link falls back to the docs
+// index and the build logs a warning, instead of shipping a 404.
+const ids = new Set((await getDocs()).map((d) => d.id));
+const docLink = (id: string) => {
+  if (ids.has(id)) return docHref(id);
+  console.warn(`[landing] doc "${id}" not found in the app repo docs; linking to /docs/ instead`);
+  return `${base}docs/`;
+};
+const docs = {
+  packs: docLink('guides/writing-query-packs'),
+  extensions: docLink('guides/writing-extensions'),
+  entra: docLink('guides/register-your-own-entra-app'),
+};
 
 const query = `SigninLogs
 | where TimeGenerated > ago(1d)
