@@ -1,0 +1,10 @@
+---
+import { operator } from '../lib/legal';
+---
+<address>
+  {operator.name}<br />
+  {operator.street}<br />
+  {operator.city}<br />
+  {operator.country}
+</address>
+<p>Email: <a href={`mailto:${operator.email}`}>{operator.email}</a></p>

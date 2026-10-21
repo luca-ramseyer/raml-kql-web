@@ -1,6 +1,7 @@
 ---
 import Wordmark from './Wordmark.astro';
 import { repoUrl } from '../lib/release';
+import { legalHref } from '../lib/legal';
 ---
 <footer class="site-footer">
   <div class="wrap">
@@ -12,6 +13,8 @@ import { repoUrl } from '../lib/release';
       <a href={`${repoUrl}/issues`}>Issues</a>
       <a href={`${repoUrl}/blob/main/LICENSE`}>MIT licence</a>
       <a href={`${repoUrl}/blob/main/SECURITY.md`}>Security</a>
+      <a href={legalHref.notice}>Legal notice</a>
+      <a href={legalHref.privacy}>Privacy</a>
     </nav>
     <p class="legal">Raml KQL is not affiliated with, endorsed by or sponsored by Microsoft. “Microsoft”, “Azure”, “Defender”, “Sentinel” and “Visual Studio Code” are trademarks of Microsoft. This site sets no cookies and runs no analytics.</p>
   </div>
