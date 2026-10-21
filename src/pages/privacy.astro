@@ -1,0 +1,61 @@
+---
+import Docs from '../layouts/Docs.astro';
+import Operator from '../components/Operator.astro';
+import { docHref, getDocs } from '../lib/docs';
+import { legalHref, legalNav, operator } from '../lib/legal';
+import { releasesUrl } from '../lib/release';
+
+// The app's own privacy policy lives in the app repo docs. If it is renamed there, fall back to
+// the docs index and warn, as the landing page does.
+const appPolicyId = 'privacy-policy';
+const hasAppPolicy = (await getDocs()).some((d) => d.id === appPolicyId);
+if (!hasAppPolicy) console.warn(`[privacy] doc "${appPolicyId}" not found in the app repo docs; linking to /docs/ instead`);
+const appPolicy = docHref(hasAppPolicy ? appPolicyId : 'index');
+
+const githubPrivacy = 'https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement';
+---
+<Docs
+  title="Privacy"
+  description="What happens to your data when you visit this site or use the Raml KQL app."
+  section="Legal"
+  nav={legalNav}
+  current={legalHref.privacy}
+>
+  <p><em>Last updated: <time datetime="2026-10-21">21 October 2026</time>.</em></p>
+
+  <h2>Who is responsible</h2>
+  <p>This site, kql.raml.ch, is run by:</p>
+  <Operator />
+  <p>This notice is written under the Swiss Federal Act on Data Protection (FADP).</p>
+
+  <h2>Hosting and server logs</h2>
+  <p>The site is a set of static pages hosted on GitHub Pages by GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA. GitHub delivers it through a content delivery network, so your request may be answered by a server outside Switzerland.</p>
+  <p>When you open a page, your browser sends GitHub your IP address, your browser’s user agent, the time and the address of the page you requested. GitHub uses this to deliver the site, and <a href="https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages#data-collection">logs visitors’ IP addresses for security purposes</a>. I do not have access to these logs. <a href={githubPrivacy}>GitHub’s privacy statement</a> applies.</p>
+  {/* TODO(luca): GitHub does not say how long it keeps GitHub Pages visitor logs (neither the Pages docs
+      nor the general privacy statement give a period). Add the retention period here if GitHub confirms one,
+      or leave it out. */}
+
+  <h2>Fonts</h2>
+  <p>The pages use the Montserrat and Cormorant Garamond fonts, loaded from Google Fonts (Google LLC, USA). Your browser fetches them from fonts.googleapis.com and fonts.gstatic.com, which sends Google your IP address, your browser’s user agent and the address of this site. According to Google, <a href="https://developers.google.com/fonts/faq/privacy">Google Fonts sets no cookies</a>, uses the IP address to answer the request and for security, and does not use the data to build profiles or for advertising. <a href="https://policies.google.com/privacy">Google’s privacy policy</a> applies.</p>
+  {/* TODO(luca): Google does not publish a retention period for Google Fonts request logs. If you would rather
+      not send visitors' IP addresses to Google at all, self-host the two fonts and delete this section. */}
+
+  <h2>Transfers to the USA</h2>
+  <p>GitHub and Google are based in the USA. Both are certified under the Swiss-U.S. Data Privacy Framework, which Switzerland recognises as providing adequate data protection for certified companies.</p>
+
+  <h2>Search</h2>
+  <p>The docs search runs entirely in your browser. Its index is a set of static files loaded from this site, and what you type is not sent to any server.</p>
+
+  <h2>No cookies, analytics or tracking</h2>
+  <p>This site sets no cookies and stores nothing in your browser’s local storage. It has no analytics, no tracking, no advertising and no embedded content from other sites.</p>
+
+  <h2>Downloads, updates and GitHub</h2>
+  <p>The download links point to <a href={releasesUrl}>GitHub Releases</a>, and the app downloads its updates from there too. Links to the source code and issues also lead to GitHub. Those requests go to GitHub, not to this site, and <a href={githubPrivacy}>GitHub’s privacy statement</a> applies to them.</p>
+
+  <h2>The Raml KQL app</h2>
+  <p>The app collects no telemetry or usage data, and no Raml KQL server is involved. Your queries go from your computer to Microsoft with your own identity. Apart from Microsoft, the app only contacts GitHub to check for updates (you can turn this off), and git hosts and extensions that you add yourself. The <a href={appPolicy}>app’s privacy policy</a> has the details.</p>
+
+  <h2>Your rights</h2>
+  <p>Under the FADP you can ask what personal data is held about you, and ask for it to be corrected or deleted. I do not receive or keep any data about visitors to this site myself; the server logs and font requests described above are held by GitHub and Google. If you email me, I use your message and address only to answer you.</p>
+  <p>For any privacy question or request, write to <a href={`mailto:${operator.email}`}>{operator.email}</a>.</p>
+</Docs>

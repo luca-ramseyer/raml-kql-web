@@ -1,0 +1,28 @@
+---
+import Docs from '../layouts/Docs.astro';
+import Operator from '../components/Operator.astro';
+import { legalHref, legalNav } from '../lib/legal';
+import { repoUrl } from '../lib/release';
+---
+<Docs
+  title="Legal notice"
+  description="Who runs this site and how to reach them."
+  section="Legal"
+  nav={legalNav}
+  current={legalHref.notice}
+>
+  <h2>Operator</h2>
+  <Operator />
+
+  <h2>The project</h2>
+  <p>Raml KQL is a free, open-source, non-commercial project under the <a href={`${repoUrl}/blob/main/LICENSE`}>MIT licence</a>.</p>
+
+  <h2>Security issues</h2>
+  <p>Please do not report security vulnerabilities in public issues. Use GitHub’s private vulnerability reporting instead: open the repository’s <a href={`${repoUrl}/security`}>Security</a> tab and choose <strong>Report a vulnerability</strong>. The <a href={`${repoUrl}/blob/main/SECURITY.md`}>security policy</a> lists what to include.</p>
+
+  <h2>Trademarks</h2>
+  <p>Raml KQL is not affiliated with, endorsed by or sponsored by Microsoft. “Microsoft”, “Azure”, “Defender”, “Sentinel” and “Visual Studio Code” are trademarks of Microsoft.</p>
+
+  <h2>Privacy</h2>
+  <p>How this site and the app handle data is described in the <a href={legalHref.privacy}>privacy notice</a>.</p>
+</Docs>
