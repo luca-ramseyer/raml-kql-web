@@ -8,7 +8,7 @@ interface Props { title: string; description?: string; image?: string; type?: 'w
 const SITE = 'Raml KQL';
 const { title, description = 'Run one KQL query across many Entra tenants and Log Analytics workspaces, without a Defender multi-tenant organization. Open source.', image = '/og.png', type = 'website' } = Astro.props;
 const base = import.meta.env.BASE_URL;
-const full = title === SITE ? title : `${title} · ${SITE}`;
+const full = title.startsWith(SITE) ? title : `${title} · ${SITE}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const og = new URL(base.replace(/\/$/, '') + image, Astro.site);
 // Non-blocking font stylesheet: loads as print, switches to all when ready.
