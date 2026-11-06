@@ -44,8 +44,25 @@ const features = [
   { title: 'Extensions with least privilege', body: 'Sandboxed extensions add enrichers, result renderers, themes and commands. Each permission is requested explicitly and can be revoked. The repository includes a VirusTotal enricher and a country map renderer as examples.', href: docs.extensions, link: 'Write an extension' },
   { title: 'Shareable query packs', body: 'A pack is a folder of parameterised .kql files and a small manifest, shared through a git repository or a file. Packs are data only. They never run code, and no query runs until you press Run.', href: docs.packs, link: 'Write a pack' },
 ];
+// Structured data helps search engines tell this app apart from the RAML API language.
+const site = Astro.site?.href;
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Raml KQL',
+  applicationCategory: 'SecurityApplication',
+  operatingSystem: 'macOS, Windows, Linux',
+  description: 'Open-source desktop app that runs one KQL query across many Azure Log Analytics and Microsoft Sentinel workspaces in many Entra tenants, without a Defender multi-tenant organization.',
+  url: site,
+  downloadUrl: releasesUrl,
+  sameAs: [repoUrl],
+  license: 'https://opensource.org/licenses/MIT',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  ...(release && { softwareVersion: release.version }),
+};
 ---
-<Base title="Raml KQL">
+<Base title="Raml KQL: run one KQL query across many tenants and workspaces">
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(jsonLd)} />
   <section class="hero wrap">
     <div class="mark"><Wordmark as="p" size="clamp(32px, 9vw, 56px)" tagline /></div>
     <h1>One KQL query across every tenant you work in.</h1>
